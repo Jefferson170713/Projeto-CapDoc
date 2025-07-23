@@ -1,0 +1,6 @@
+pandas
+numpy
+PyQt5
+jayDeBeApi>=1.2.3
+pyinstaller>=4.0
+openpyxl>=3.0.0

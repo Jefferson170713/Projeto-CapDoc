@@ -1,0 +1,15 @@
+*Arquivos
+*.pyc
+*.pyo
+*.pyd
+*.pkl
+*.db
+*.sqlite
+*.log
+*.csv
+*.xlsx
+*.xls
+*.json
+*.xml
+*venv/
+*.egg
