@@ -48,67 +48,78 @@ class CapaDocPackagesByProcedures:
         main_layout = QVBoxLayout()
         
         # ========== SEÇÃO Pacote pro Procediemnto ==========
-        # Grupo para Pacote pro Procediemnto
-        group_package_by_procedure = QGroupBox("CAPA - Aba Pacote por Procedimento")
-        layout_package_by_procedures = QVBoxLayout()
-        
-        # Status layout para Pacote pro Procediemnto
+        # Grupo para Status e Progresso
+        group_status_progress = QGroupBox("Status e Progresso")
+        layout_status_progress = QVBoxLayout()
+
+        # Status layout
         status_layout_desc = QHBoxLayout()
         self.label_status_procedures = QLabel("Nenhum arquivo carregado - Pacote por Procedimento.")
         status_layout_desc.addWidget(self.label_status_procedures)
         status_layout_desc.addStretch()
-        
+
         btn_clean_status_procedures = QPushButton("Limpar Status")
         btn_clean_status_procedures.setFixedSize(100, 35)
         btn_clean_status_procedures.clicked.connect(self.clear_status_capa)
         status_layout_desc.addWidget(btn_clean_status_procedures)
-        layout_package_by_procedures.addLayout(status_layout_desc)
-        
-        # Barra de progresso para Pacote pro Procediemnto
+        layout_status_progress.addLayout(status_layout_desc)
+
+        # Barra de progresso
         self.progress_bar_process_procedures = QProgressBar()
         self.progress_bar_process_procedures.setValue(0)
         self.progress_bar_process_procedures.setMinimum(0)
         self.progress_bar_process_procedures.setMaximum(100)
-        layout_package_by_procedures.addWidget(self.progress_bar_process_procedures)
+        layout_status_progress.addWidget(self.progress_bar_process_procedures)
+
+        group_status_progress.setLayout(layout_status_progress)
+        main_layout.addWidget(group_status_progress)
         
-        # 5 Checkboxes para Pacote pro Procediemnto
+        # Grupo para Filtros e Pesquisa
+        group_filters_search = QGroupBox("Filtros e Pesquisa")
+        layout_filters_search = QVBoxLayout()
+
+        # 5 Checkboxes
         checkboxe_layout_procedures = QHBoxLayout()
         self.checkbox_hapvida = QCheckBox("HAPVIDA")
         self.checkbox_ccg = QCheckBox("CCG")
         self.checkbox_clinipam = QCheckBox("CLINIPAM")
         self.checkbox_ndi_minas = QCheckBox("NDI MINAS")
         self.checkbox_ndi_saude = QCheckBox("NDI SAÚDE")
-        
+
         checkboxe_layout_procedures.addWidget(self.checkbox_hapvida)
         checkboxe_layout_procedures.addWidget(self.checkbox_ccg)
         checkboxe_layout_procedures.addWidget(self.checkbox_clinipam)
         checkboxe_layout_procedures.addWidget(self.checkbox_ndi_minas)
         checkboxe_layout_procedures.addWidget(self.checkbox_ndi_saude)
-        layout_package_by_procedures.addLayout(checkboxe_layout_procedures)
-        
-        # Campo de pesquisa e botão para Pacote pro Procediemnto
+        layout_filters_search.addLayout(checkboxe_layout_procedures)
+
+        # Campo de pesquisa
         search_layout_capa = QHBoxLayout()
         self.search_input_capa = QLineEdit()
         self.search_input_capa.setFixedHeight(30)
         self.search_input_capa.setPlaceholderText("Digite CAPA que deseja pesquisar...")
         search_layout_capa.addWidget(self.search_input_capa)
-        
+
         btn_search_capa = QPushButton("Pesquisar CAPA")
         btn_search_capa.setFixedSize(100,35)
         btn_search_capa.clicked.connect(self.search_capa)
         search_layout_capa.addWidget(btn_search_capa)
-        layout_package_by_procedures.addLayout(search_layout_capa)
+        layout_filters_search.addLayout(search_layout_capa)
+
+        group_filters_search.setLayout(layout_filters_search)
+        main_layout.addWidget(group_filters_search)
         
-        # Tabela para Pacote pro Procediemnto
-        self.table_capa_package_by_procedures = QTableWidget()
-        self.table_capa_package_by_procedures.setMaximumHeight(150)  # Mostra aproximadamente 5 linhas
-        layout_package_by_procedures.addWidget(self.table_capa_package_by_procedures)
-        
-        group_package_by_procedure.setLayout(layout_package_by_procedures)
-        main_layout.addWidget(group_package_by_procedure)
+        # Grupo para carregar a tabela
+        group_table = QGroupBox("Tabela de Procedimentos")
+        layout_table = QVBoxLayout()
+        self.table_packages_by_procedures = QTableWidget()
+        self.table_packages_by_procedures.setMaximumHeight(150)
+        layout_table.addWidget(self.table_packages_by_procedures)
+        group_table.setLayout(layout_table)
+        main_layout.addWidget(group_table)
         
         # Grupo específico para o botão
-        group_button = QGroupBox()
+        group_button = QGroupBox('Processamento')
         button_layout = QHBoxLayout()
         button_layout.addStretch()  # Espaço à esquerda
 

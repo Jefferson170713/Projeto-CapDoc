@@ -13,7 +13,7 @@ class CapaDoc(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle('Capa-Doc')
-        self.setGeometry(100, 100, 700, 450)
+        self.setGeometry(100, 100, 700, 500)
         self.setWindowIcon(QIcon(r'./Arquivos/logo/logo.ico'))
         self.capa_doc = QTabWidget()
         self.create_packages_by_procedures = QWidget()
