@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtWidgets import QTabWidget
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtGui import QIcon
-from PackagesByProcedures import CapaDocPackagesByProcedures
+from Program_Windows.PackagesByProcedures import CapaDocPackagesByProcedures
 
 from PyQt5.QtWidgets import QWidget
 

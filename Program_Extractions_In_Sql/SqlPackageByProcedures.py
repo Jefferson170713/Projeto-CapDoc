@@ -2,6 +2,13 @@ import pandas as pd
 import jaydebeapi
 import time
 import locale
+import sys
+import os
+
+# Adiciona o diretório pai ao path para importar módulos da pasta Arquivos
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(parent_dir)
+
 from Arquivos.Oracle_jdbc.jdbc_permission_package_by_procedures import JdbcPermission
 
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
@@ -120,7 +127,7 @@ if __name__ == "__main__":
     
     # Essa parte do código é para teste e execução direta do script.
     # caminho para o driver JDBC
-    driver_path = r'./Arquivos/Oracle_jdbc/ojdbc8.jar'
+    driver_path = r'../Arquivos/Oracle_jdbc/ojdbc8.jar'
     
     # protocolo de consulta SQL
     capa = '642384'
