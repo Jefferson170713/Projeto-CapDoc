@@ -15,12 +15,18 @@ from PyQt5.QtWidgets import QTableWidgetItem
 from PyQt5.QtWidgets import QCheckBox
 from PyQt5.QtWidgets import QGroupBox
 import os
+import sys
 import itertools
 import numpy as np
 import time
 import locale
 # Configura a localidade para o formato brasileiro
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+
+# Adiciona o diretório pai ao path para importar módulos da pasta Arquivos
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(parent_dir)
+from Program_Extractions_In_Sql.SqlPackageByProcedures import QueryPackageByProcedure
 
 class CapaDocPackagesByProcedures:
     def __init__(self, parent=None):
@@ -59,7 +65,7 @@ class CapaDocPackagesByProcedures:
         status_layout_desc.addStretch()
 
         btn_clean_status_procedures = QPushButton("Limpar Status")
-        btn_clean_status_procedures.setFixedSize(100, 35)
+        btn_clean_status_procedures.setFixedSize(150, 35)
         btn_clean_status_procedures.clicked.connect(self.clear_status_capa)
         status_layout_desc.addWidget(btn_clean_status_procedures)
         layout_status_progress.addLayout(status_layout_desc)
@@ -101,7 +107,7 @@ class CapaDocPackagesByProcedures:
         search_layout_capa.addWidget(self.search_input_capa)
 
         btn_search_capa = QPushButton("Pesquisar CAPA")
-        btn_search_capa.setFixedSize(100,35)
+        btn_search_capa.setFixedSize(150,35)
         btn_search_capa.clicked.connect(self.search_capa)
         search_layout_capa.addWidget(btn_search_capa)
         layout_filters_search.addLayout(search_layout_capa)
@@ -142,8 +148,61 @@ class CapaDocPackagesByProcedures:
         return locale.format_string('%.f', value, grouping=True)
     
     def clear_status_capa(self):
-        ...
+        self.label_status_procedures.setText("Nenhum arquivo carregado - Pacote por Procedimento.")
+        self.progress_bar_process_procedures.setValue(0)
+        self.table_packages_by_procedures.clearContents()
+        self.table_packages_by_procedures.setRowCount(0)
+        self.table_packages_by_procedures.setColumnCount(0)
+        
+        
     def search_capa(self):
-        ...
+        search_capa = self.search_input_capa.text().strip()
+        # path_drive = r'../Arquivos/Oracle_jdbc/ojdbc8.jar'
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        path_drive = os.path.join(script_dir, '..', 'Arquivos', 'Oracle_jdbc', 'ojdbc8.jar')
+        
+        if search_capa:
+            try:
+                list_empresa = []
+                
+                if self.checkbox_hapvida.isChecked():
+                    list_empresa.append('1')
+                if self.checkbox_ccg.isChecked():
+                    list_empresa.append('8')
+                if self.checkbox_clinipam.isChecked():
+                    list_empresa.append('9')
+                if self.checkbox_ndi_minas.isChecked():
+                    list_empresa.append('10')
+                if self.checkbox_ndi_saude.isChecked():
+                    list_empresa.append('14')
+                
+                list_empresa = ', '.join(map(str, list_empresa))
+                
+                if not list_empresa:
+                    QMessageBox.warning(self.parent, "AVISO - CAPA", "Por favor, selecione uma operadora.\n\n - HAPVIDA\n - CCG\n - CLINIPAM\n - NDI MINAS\n - NDI SAÚDE")
+                    return
+                
+                jdbc_permission = QueryPackageByProcedure(path_drive)
+                
+                self.df = jdbc_permission.fetch_data(chunk_size=50000, capa=search_capa, list_empresa=list_empresa, progress_bar=self.progress_bar_process_procedures)
+                
+                number_lines = self.get_format_int(self.df.shape[0])
+                self.label_status_procedures.setText(f"{number_lines} linhas carregadas - Capa.")
+                
+                self.table_packages_by_procedures.setRowCount(self.df.shape[0])
+                self.table_packages_by_procedures.setColumnCount(self.df.shape[1])
+                self.table_packages_by_procedures.setHorizontalHeaderLabels(self.df.columns.tolist())
+                
+                for row_idx, row_data in self.df.iterrows():
+                    for col_idx, value in enumerate(row_data):
+                        item = QTableWidgetItem(str(value))
+                        self.table_packages_by_procedures.setItem(row_idx, col_idx, item)
+                
+            except Exception as error:
+                QMessageBox.critical(self.parent, "Erro", f"Ocorreu um erro ao buscar os dados: {str(error)}")
+                
+        else:
+            QMessageBox.warning(self.parent, "AVISO - CAPA", "Por favor, insira um termo de pesquisa válido.")
+        
     def process_and_save_packages_by_procedures(self):
         ...
