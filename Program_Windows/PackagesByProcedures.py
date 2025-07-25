@@ -189,14 +189,26 @@ class CapaDocPackagesByProcedures:
                 number_lines = self.get_format_int(self.df.shape[0])
                 self.label_status_procedures.setText(f"{number_lines} linhas carregadas - Capa.")
                 
-                self.table_packages_by_procedures.setRowCount(self.df.shape[0])
-                self.table_packages_by_procedures.setColumnCount(self.df.shape[1])
-                self.table_packages_by_procedures.setHorizontalHeaderLabels(self.df.columns.tolist())
+                # Para receber a 1000 primeiras linhas do DataFrame
+                if self.df.shape[0] < 1000:
+                    df = self.df.copy()
+                else:
+                    df = self.df[self.df.index < 1000].copy()
                 
-                for row_idx, row_data in self.df.iterrows():
+                self.table_packages_by_procedures.setRowCount(df.shape[0])
+                self.table_packages_by_procedures.setColumnCount(df.shape[1])
+                self.table_packages_by_procedures.setHorizontalHeaderLabels(df.columns.tolist())
+                
+                for row_idx, row_data in df.iterrows():
                     for col_idx, value in enumerate(row_data):
                         item = QTableWidgetItem(str(value))
                         self.table_packages_by_procedures.setItem(row_idx, col_idx, item)
+                
+                print(self.df.columns.tolist())
+                #self.df.colunms = self.df.columns.str.upper().str.strip()
+                # file_save = r'./642384.csv'
+                # self.df.to_csv(file_save, encoding='latin1', sep=';', index=False)
+                # print(f'Arquivo salvo com sucesso em: {file_save}')
                 
             except Exception as error:
                 QMessageBox.critical(self.parent, "Erro", f"Ocorreu um erro ao buscar os dados: {str(error)}")
@@ -205,4 +217,90 @@ class CapaDocPackagesByProcedures:
             QMessageBox.warning(self.parent, "AVISO - CAPA", "Por favor, insira um termo de pesquisa válido.")
         
     def process_and_save_packages_by_procedures(self):
-        ...
+        
+        self.initial_treatments()
+        self.df = self.group_columns(self.df)
+        self.df = self.number_of_networks_and_networks(self.df)
+        self.df = self.ungoroup_columns(self.df)
+        print(self.df.head())             
+    
+    # 1. Initial treatments for the dataframe
+    def initial_treatments(self):
+        print(f'1. Função de tratamento \n 1.')
+        self.df.CD_PROCEDIMENTO = self.treatment_serie(self.df.CD_PROCEDIMENTO)
+        print(f'1.1 ')
+        self.df.CD_PROCEDIMENTO_TUSS = self.treatment_serie(self.df.CD_PROCEDIMENTO_TUSS)
+        print(f'1.2 ')
+        self.df.URG_ELE_TAX_MAT_MED_CIR_ANE_AUX = self.upper_columns(self.df.URG_ELE_TAX_MAT_MED_CIR_ANE_AUX)
+        
+    # 1.1 Function to treat a pandas Series   
+    def treatment_serie(self, serie):
+        return serie.astype(str).str.upper().str.strip().replace(';', ': ', regex=True)
+
+    # 1.2 Função upper para as colunas do DataFrame
+    def upper_columns(self, series):
+        return series.str.upper()
+    
+    # 2. Função para criar a chave de rede
+    def group_columns(self, df):
+        df['KEY'] = (
+            df['TABELA'].astype(str) + '@@' +
+            df['LOCAL_CAPA'].astype(str) + '@@' +
+            df['CD_PROCEDIMENTO'].astype(str) + '@@' +
+            df['CD_PROCEDIMENTO_TUSS'].astype(str) + '@@' +
+            df['NM_PROCEDIMENTO'].astype(str) + '@@' +
+            df['NM_PROCEDIMENTO_TUSS'].astype(str) + '@@' +
+            df['NU_ORDEM_PACOTE'].astype(str) + '@@' +
+            df['CD_TIPO_ACOMODACAO'].astype(str) + '@@' +
+            df['URG_ELE_TAX_MAT_MED_CIR_ANE_AUX'].astype(str) + '@@' +
+            df['VALOR'].astype(str)
+        )
+        columns_to_show = ['KEY', 'CD_TIPO_REDE_ATENDIMENTO']
+        #df.drop_columns(columns, axis=1, inplace=True)
+        df = df[columns_to_show].copy()
+        print(f'Quantidade de linhas e colunas: {df.shape}')
+        df.drop_duplicates(inplace=True)
+        print(f'Quantidade de linhas e colunas: {df.shape}')
+        df.sort_values(by='CD_TIPO_REDE_ATENDIMENTO', inplace=True)
+        df.reset_index(drop=True, inplace=True)
+        
+        return df
+    
+    # 2.1 Função para contar a quantidade de redes e listar as redes
+    def number_of_networks_and_networks(self, df):
+        df = (
+            df.groupby('KEY')['CD_TIPO_REDE_ATENDIMENTO']
+            .agg([
+                ('CD_TIPO_REDE_ATENDIMENTO', lambda x: ', '.join(sorted(set(x)))),
+                ('QUANTIDADE_REDES', 'nunique')
+            ])
+            .reset_index()
+        )
+        columns_to_show = ['KEY', 'QUANTIDADE_REDES', 'CD_TIPO_REDE_ATENDIMENTO']
+        df = df[columns_to_show].copy()
+        df.drop_duplicates(inplace=True)
+        df.sort_values(by='QUANTIDADE_REDES', ascending=False, inplace=True)
+        df.reset_index(drop=True, inplace=True)
+        return df
+    
+    # 2.2 Função para desagrupar as colunas
+    def ungoroup_columns(self, df):
+        columns = ['TABELA', 'LOCAL_CAPA', 'CD_PROCEDIMENTO', 'CD_PROCEDIMENTO_TUSS',
+            'NM_PROCEDIMENTO', 'NM_PROCEDIMENTO_TUSS', 'NU_ORDEM_PACOTE',
+            'CD_TIPO_ACOMODACAO', 'URG_ELE_TAX_MAT_MED_CIR_ANE_AUX', 'VALOR',]
+        
+        df[columns] = df['KEY'].str.split('@@', expand=True)
+        
+        df.drop(columns=['KEY'], inplace=True)
+        print(df.columns.tolist())
+        
+        df.rename(columns={'CD_TIPO_REDE_ATENDIMENTO': 'REDES'}, inplace=True)
+        
+        columns = ['TABELA', 'LOCAL_CAPA', 'CD_PROCEDIMENTO', 'CD_PROCEDIMENTO_TUSS',
+            'NM_PROCEDIMENTO', 'NM_PROCEDIMENTO_TUSS', 'NU_ORDEM_PACOTE',
+            'CD_TIPO_ACOMODACAO', 'URG_ELE_TAX_MAT_MED_CIR_ANE_AUX', 'VALOR', 'QUANTIDADE_REDES', 'REDES']
+        
+        df = df[columns].copy()
+        print(df.shape)
+        
+        return df
