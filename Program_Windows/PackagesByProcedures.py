@@ -55,7 +55,7 @@ class CapaDocPackagesByProcedures:
         
         # ========== SEÇÃO Pacote pro Procediemnto ==========
         # Grupo para Status e Progresso
-        group_status_progress = QGroupBox("Status e Progresso")
+        group_status_progress = QGroupBox("📶 Status e Progresso")
         layout_status_progress = QVBoxLayout()
 
         # Status layout
@@ -81,7 +81,7 @@ class CapaDocPackagesByProcedures:
         main_layout.addWidget(group_status_progress)
         
         # Grupo para Filtros e Pesquisa
-        group_filters_search = QGroupBox("Filtros e Pesquisa")
+        group_filters_search = QGroupBox("🔎 Filtros e Pesquisa")
         layout_filters_search = QVBoxLayout()
 
         # 5 Checkboxes
@@ -106,7 +106,7 @@ class CapaDocPackagesByProcedures:
         self.search_input_capa.setPlaceholderText("Digite CAPA que deseja pesquisar...")
         search_layout_capa.addWidget(self.search_input_capa)
 
-        btn_search_capa = QPushButton("Pesquisar CAPA")
+        btn_search_capa = QPushButton("🔍 Pesquisar CAPA")
         btn_search_capa.setFixedSize(150,35)
         btn_search_capa.clicked.connect(self.search_capa)
         search_layout_capa.addWidget(btn_search_capa)
