@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QTabWidget
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtGui import QIcon
 from Program_Windows.PackagesByProcedures import CapaDocPackagesByProcedures
+from Program_Windows.Services import CapaDocServices
 
 # Classe principal da aplicação
 class CapaDoc(QMainWindow):
@@ -32,7 +33,9 @@ class CapaDoc(QMainWindow):
         
         self.capa_doc = QTabWidget()
         self.create_packages_by_procedures = QWidget()
+        self.create_services = QWidget()
         self.package_by_procedures = CapaDocPackagesByProcedures(parent=self)
+        self.services = CapaDocServices(parent=self)
 
         self.createview()
 
@@ -41,9 +44,11 @@ class CapaDoc(QMainWindow):
         space = 5 * ' '
         self.setCentralWidget(self.capa_doc)
         self.capa_doc.addTab(self.create_packages_by_procedures, f'{space}Pacote por Procedimento{space}')
+        self.capa_doc.addTab(self.create_services, f'{space}Serviços{space}')
         self.capa_doc.setDocumentMode(True)
         self.capa_doc.setMovable(True)
         self.package_by_procedures.create_packages_by_procedures_window(self.create_packages_by_procedures)
+        self.services.create_services_windows(self.create_services)
 
 # Loop do programa em funcionamento
 def main():
