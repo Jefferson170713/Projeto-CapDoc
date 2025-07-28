@@ -64,7 +64,7 @@ class CapaDocPackagesByProcedures:
         status_layout_desc.addWidget(self.label_status_procedures)
         status_layout_desc.addStretch()
 
-        btn_clean_status_procedures = QPushButton("Limpar Status")
+        btn_clean_status_procedures = QPushButton("🔄 Limpar Status")
         btn_clean_status_procedures.setFixedSize(150, 35)
         btn_clean_status_procedures.clicked.connect(self.clear_status_capa)
         status_layout_desc.addWidget(btn_clean_status_procedures)
