@@ -116,7 +116,7 @@ class CapaDocPackagesByProcedures:
         main_layout.addWidget(group_filters_search)
         
         # Grupo para carregar a tabela
-        group_table = QGroupBox("Tabela de Procedimentos")
+        group_table = QGroupBox("🗓️ Tabela de Procedimentos")
         layout_table = QVBoxLayout()
         self.table_packages_by_procedures = QTableWidget()
         self.table_packages_by_procedures.setMaximumHeight(150)
