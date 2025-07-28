@@ -235,6 +235,7 @@ class CapaDocPackagesByProcedures:
         
     # 1.1 Function to treat a pandas Series   
     def treatment_serie(self, serie):
+        serie = serie.astype(str).fillna('-')
         return serie.astype(str).str.upper().str.strip().replace(';', ': ', regex=True)
 
     # 1.2 Função upper para as colunas do DataFrame
