@@ -40,18 +40,21 @@ O CapaDoc é uma aplicação desktop desenvolvida em Python que permite:
 ### Configuração do Ambiente
 
 1. Clone o repositório:
+
 ```bash
 git clone https://github.com/Jefferson170713/Projeto-CapDoc.git
 cd Projeto-CapDoc
 ```
 
 2. Crie um ambiente virtual:
+
 ```bash
 python -m venv venv
 venv\Scripts\activate  # Windows
 ```
 
 3. Instale as dependências:
+
 ```bash
 pip install -r requirements.txt
 ```
@@ -105,6 +108,7 @@ CapaDoc/
 ### Credenciais do Banco
 
 Configure suas credenciais em:
+
 - `Arquivos/Oracle_jdbc/jdbc_permission_package_by_procedures.py`
 
 ### Personalizações
@@ -135,6 +139,7 @@ Se encontrar algum problema, por favor:
 ## 📝 Changelog
 
 ### v1.0.0 (2025-07-28)
+
 - ✨ Interface PyQt5 com símbolos Unicode
 - 🔗 Conexão Oracle via JDBC
 - 📊 Processamento de dados com pandas
@@ -148,6 +153,7 @@ Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICE
 ## 👨‍💻 Autor
 
 **Jefferson Almeida**
+
 - GitHub: [@Jefferson170713](https://github.com/Jefferson170713)
 - Email: jefferson.almeia05@aluno.ifce.edu.br
 
