@@ -15,3 +15,10 @@
 *.egg
 *__pycache__/
 *.DS_Store
+*.spec
+*build/
+*dist
+*build_app.bat
+*build_app_spec.bat
+*copy_files.bat
+*CapaDoc.exe

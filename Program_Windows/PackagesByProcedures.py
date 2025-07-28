@@ -26,6 +26,13 @@ locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
 # Adiciona o diretório pai ao path para importar módulos da pasta Arquivos
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_dir)
+
+# Adiciona também o diretório atual para executáveis empacotados
+if getattr(sys, 'frozen', False):
+    # Executável PyInstaller
+    current_dir = os.path.dirname(sys.executable)
+    sys.path.append(current_dir)
+
 from Program_Extractions_In_Sql.SqlPackageByProcedures import QueryPackageByProcedure
 
 class CapaDocPackagesByProcedures:
@@ -157,8 +164,36 @@ class CapaDocPackagesByProcedures:
         
     def search_capa(self):
         search_capa = self.search_input_capa.text().strip()
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        path_drive = os.path.join(script_dir, '..', 'Arquivos', 'Oracle_jdbc', 'ojdbc8.jar')
+        
+        # Detecta se está rodando como executável PyInstaller
+        if getattr(sys, 'frozen', False):
+            # Executável PyInstaller - tenta várias localizações
+            application_path = os.path.dirname(sys.executable)
+            possible_paths = [
+                os.path.join(application_path, 'Arquivos', 'Oracle_jdbc', 'ojdbc8.jar'),
+                os.path.join(application_path, '_internal', 'Arquivos', 'Oracle_jdbc', 'ojdbc8.jar'),
+                os.path.join(sys._MEIPASS, 'Arquivos', 'Oracle_jdbc', 'ojdbc8.jar') if hasattr(sys, '_MEIPASS') else None
+            ]
+            path_drive = None
+            for path in possible_paths:
+                if path and os.path.exists(path):
+                    path_drive = path
+                    break
+            
+            if not path_drive:
+                path_drive = os.path.join(application_path, 'Arquivos', 'Oracle_jdbc', 'ojdbc8.jar')
+        else:
+            # Desenvolvimento normal
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            path_drive = os.path.join(script_dir, '..', 'Arquivos', 'Oracle_jdbc', 'ojdbc8.jar')
+        
+        # Debug: Verificar se o arquivo JAR existe
+        print(f"Caminho do JAR: {path_drive}")
+        print(f"JAR existe: {os.path.exists(path_drive)}")
+        
+        if not os.path.exists(path_drive):
+            QMessageBox.critical(self.parent, "Erro", f"Arquivo JAR não encontrado em: {path_drive}")
+            return
         
         if search_capa:
             try:
