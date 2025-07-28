@@ -149,8 +149,10 @@ if __name__ == "__main__":
     # Exibe os dados e o tempo
     print(f'Quantidade de linhas e colunas: {df.shape}')
     print(df)
+    df.to_csv(r'../output_services_640272.csv', index=False, sep=';', encoding='latin1')
     print(f"Tempo de execução: {elapsed:.2f} segundos")
     print(f"Tempo de execução: {elapsed / 60:.2f} minutos")
+    
     
     
     
