@@ -157,7 +157,6 @@ class CapaDocPackagesByProcedures:
         
     def search_capa(self):
         search_capa = self.search_input_capa.text().strip()
-        # path_drive = r'../Arquivos/Oracle_jdbc/ojdbc8.jar'
         script_dir = os.path.dirname(os.path.abspath(__file__))
         path_drive = os.path.join(script_dir, '..', 'Arquivos', 'Oracle_jdbc', 'ojdbc8.jar')
         
@@ -205,10 +204,6 @@ class CapaDocPackagesByProcedures:
                         self.table_packages_by_procedures.setItem(row_idx, col_idx, item)
                 
                 print(self.df.columns.tolist())
-                #self.df.colunms = self.df.columns.str.upper().str.strip()
-                # file_save = r'./642384.csv'
-                # self.df.to_csv(file_save, encoding='latin1', sep=';', index=False)
-                # print(f'Arquivo salvo com sucesso em: {file_save}')
                 
             except Exception as error:
                 QMessageBox.critical(self.parent, "Erro", f"Ocorreu um erro ao buscar os dados: {str(error)}")
@@ -218,10 +213,17 @@ class CapaDocPackagesByProcedures:
         
     def process_and_save_packages_by_procedures(self):
         
+        save_path = QFileDialog.getExistingDirectory(self.parent, "Selecione a pasta para salvar os arquivos", os.getcwd())
+        if not save_path:
+            QMessageBox.warning(self.parent, "AVISO - CAPA", "Nenhuma pasta selecionada para salvar os arquivos.")
+            return
+        
         self.initial_treatments()
         self.df = self.group_columns(self.df)
         self.df = self.number_of_networks_and_networks(self.df)
         self.df = self.ungoroup_columns(self.df)
+        name_capa = self.search_input_capa.text().strip()
+        self.save_to_excel(self.df, save_path, name_capa)
         print(self.df.head())             
     
     # 1. Initial treatments for the dataframe
@@ -305,3 +307,35 @@ class CapaDocPackagesByProcedures:
         print(df.shape)
         
         return df
+    
+    # 3. Função para salvar o DataFrame em um arquivo Excel
+    def save_to_excel(self, df_file, file_path, name_capa):
+        name_protocolo = name_capa
+        df = df_file.copy()
+        columns_to_show = ['TABELA', 'LOCAL_CAPA', 'CD_PROCEDIMENTO', 'CD_PROCEDIMENTO_TUSS',
+                'NM_PROCEDIMENTO', 'NM_PROCEDIMENTO_TUSS', 'NU_ORDEM_PACOTE',
+                'CD_TIPO_ACOMODACAO', 'URG_ELE_TAX_MAT_MED_CIR_ANE_AUX', 'VALOR','QUANTIDADE_REDES', 'REDES']
+        
+        nu_ordens = df.NU_ORDEM_PACOTE.unique()
+        total = len(nu_ordens)
+
+        for idx, nu_ordem in enumerate(nu_ordens, 1):
+            df_copy = df[df.NU_ORDEM_PACOTE == nu_ordem].copy()
+            sheet_file_name = 'CAPA ' + str(name_protocolo) + ' ' + str(nu_ordem) + '.xlsx'
+            output_file = os.path.join(file_path, sheet_file_name)
+            df_copy = df_copy[columns_to_show].copy()
+
+            with pd.ExcelWriter(output_file, engine='openpyxl') as writer:
+                aba_geral = f'GERAL {name_capa} - {nu_ordem}'[:31]
+                df_copy.to_excel(writer, sheet_name=aba_geral, index=False)
+
+                if df_copy.URG_ELE_TAX_MAT_MED_CIR_ANE_AUX.nunique() > 1:
+                    print(f'NU_ORDEM_PACOTE: {nu_ordem} possui mais de uma URG_ELE_TAX_MAT_MED_CIR_ANE_AUX')
+                    for num, valor in enumerate(df_copy.URG_ELE_TAX_MAT_MED_CIR_ANE_AUX.unique()):
+                        aba_nome = f'NEGOCIACAO_{num + 1}'[:31]
+                        df_valor = df_copy[df_copy.URG_ELE_TAX_MAT_MED_CIR_ANE_AUX == valor]
+                        df_valor.to_excel(writer, sheet_name=aba_nome, index=False)
+                        
+        # mensagem avisando que os arquivos foram salvos com QMensageBox
+        QMessageBox.information(self.parent, "Sucesso", f"Arquivo(s) salvo(s) com sucesso na pasta: {file_path}")
+        
