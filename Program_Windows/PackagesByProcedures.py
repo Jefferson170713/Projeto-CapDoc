@@ -125,11 +125,11 @@ class CapaDocPackagesByProcedures:
         main_layout.addWidget(group_table)
         
         # Grupo específico para o botão
-        group_button = QGroupBox('Processamento')
+        group_button = QGroupBox('💾 Processamento')
         button_layout = QHBoxLayout()
         button_layout.addStretch()  # Espaço à esquerda
 
-        btn_process_and_save = QPushButton("Processar e Salvar")
+        btn_process_and_save = QPushButton("📂 Processar e Salvar")
         btn_process_and_save.setFixedSize(150, 35)
         btn_process_and_save.clicked.connect(self.process_and_save_packages_by_procedures)
         button_layout.addWidget(btn_process_and_save)
