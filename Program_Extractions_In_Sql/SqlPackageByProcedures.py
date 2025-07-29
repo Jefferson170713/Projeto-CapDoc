@@ -130,7 +130,7 @@ if __name__ == "__main__":
     driver_path = r'../Arquivos/Oracle_jdbc/ojdbc8.jar'
     
     # protocolo de consulta SQL
-    capa = '642384'
+    capa = '643513'
     operadora = '14'
     
     # Instanciando a classe
@@ -151,6 +151,8 @@ if __name__ == "__main__":
     print(df)
     print(f"Tempo de execução: {elapsed:.2f} segundos")
     print(f"Tempo de execução: {elapsed / 60:.2f} minutos")
+    
+    df.to_csv(f'output_package_by_procedure_{capa}.csv', sep=';', encoding='latin1', index=False)
     
     
     
