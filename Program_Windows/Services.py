@@ -254,22 +254,66 @@ class CapaDocServices:
             return
         
         self.initial_treatments()
-        # self.df = self.group_columns(self.df)
-        # self.df = self.number_of_networks_and_networks(self.df)
-        # self.df = self.ungoroup_columns(self.df)
-        # name_capa = self.search_input_capa.text().strip()
-        # self.save_to_excel(self.df, save_path, name_capa)
+        self.df = self.group_columns(self.df)
+        self.df = self.number_of_networks_and_networks(self.df)
+        self.df = self.ungoroup_columns(self.df)
+        name_capa = self.search_input_capa.text().strip()
+        self.save_to_excel(self.df, save_path, name_capa)
         print(self.df.head())             
     
     # 1. Initial treatments for the dataframe
     def initial_treatments(self):
         print(f'1. Função de tratamento \n 1.')
-        ...
+        self.df['NM_PROCEDIMENTO'] = self.treatment_serie(self.df['NM_PROCEDIMENTO'])
+        self.df['NM_PROCEDIMENTO_TUSS'] = self.treatment_serie(self.df['NM_PROCEDIMENTO_TUSS'])
+        self.df['CD_PROCEDIMENTO_TUSS'] = self.removing_null_values_from_numbers_int(self.df['CD_PROCEDIMENTO_TUSS'])
+        self.df['CD_SERV_HONORARIO'] = self.removing_null_values_from_numbers_int(self.df['CD_SERV_HONORARIO'])
+
+        self.df['VL_ATUAL'] = self.removing_null_values_from_numbers_float(self.df['VL_ATUAL'])
+        self.df['VL_DEFLATOR_PORT_ATUAL'] = self.removing_null_values_from_numbers_float(self.df['VL_DEFLATOR_PORT_ATUAL'])
+        self.df['VL_DEFLATOR_UCO_ATUAL'] = self.removing_null_values_from_numbers_float(self.df['VL_DEFLATOR_UCO_ATUAL'])
+        self.df['VL_FILME_ATUAL'] = self.removing_null_values_from_numbers_float(self.df['VL_FILME_ATUAL'])
+        self.df['VL_PROPOSTO'] = self.removing_null_values_from_numbers_float(self.df['VL_PROPOSTO'])
+        self.df['VL_DEFLATOR'] = self.removing_null_values_from_numbers_float(self.df['VL_DEFLATOR'])
+        self.df['VL_DEFLATOR_UCO'] = self.removing_null_values_from_numbers_float(self.df['VL_DEFLATOR_UCO'])
+        self.df['VL_FILME_PROPOSTO'] = self.removing_null_values_from_numbers_float(self.df['VL_FILME_PROPOSTO'])
+
+        self.df['VL_ATUAL'] = self.decimal_numbers_plus_five_places(self.df['VL_ATUAL'])
+        self.df['VL_DEFLATOR_PORT_ATUAL'] = self.decimal_numbers_plus_five_places(self.df['VL_DEFLATOR_PORT_ATUAL'])
+        self.df['VL_DEFLATOR_UCO_ATUAL'] = self.decimal_numbers_plus_five_places(self.df['VL_DEFLATOR_UCO_ATUAL'])
+        self.df['VL_FILME_ATUAL'] = self.decimal_numbers_plus_five_places(self.df['VL_FILME_ATUAL'])
+        self.df['VL_PROPOSTO'] = self.decimal_numbers_plus_five_places(self.df['VL_PROPOSTO'])
+        self.df['VL_DEFLATOR'] = self.decimal_numbers_plus_five_places(self.df['VL_DEFLATOR'])
+        self.df['VL_DEFLATOR_UCO'] = self.decimal_numbers_plus_five_places(self.df['VL_DEFLATOR_UCO'])
+        self.df['VL_FILME_PROPOSTO'] = self.decimal_numbers_plus_five_places(self.df['VL_FILME_PROPOSTO'])
+
+        self.df['CD_UF'] = self.treatment_serie_simple(self.df['CD_UF'])
+        self.df['FL_PE'] = self.treatment_serie_simple(self.df['FL_PE'])
+        self.df['NM_MUNICIPIO'] = self.treatment_serie_simple(self.df['NM_MUNICIPIO'])
+        self.df['CD_MUNICIPIO'] = self.removing_null_values_from_numbers_int(self.df['CD_MUNICIPIO'])
+        self.df['CD_LOCAL'] = self.removing_null_values_from_numbers_int(self.df['CD_LOCAL'])
+        self.df['CC'] = self.treatment_serie_simple(self.df['CC'])
+        self.df['WEB'] = self.treatment_serie_simple(self.df['WEB'])
+        
         
     # 1.1 Function to treat a pandas Series   
     def treatment_serie(self, serie):
-        serie = serie.astype(str).fillna('-')
-        return serie.astype(str).str.upper().str.strip().replace(';', ': ', regex=True)
+        return serie.astype(str).fillna('-').str.upper().str.strip().replace(';', ': ', regex=True)
+    
+    # 1.3 Function to treat a pandas Series without uppercasing
+    def treatment_serie_simple(self, serie):
+        return serie.fillna('-')
+    
+    # 1.4 Function to remove null values and convert to int
+    def removing_null_values_from_numbers_int(self, serie):
+        return serie.fillna(0).astype(int)
+    
+    # 1.5 Function to remove null values and convert to float
+    def removing_null_values_from_numbers_float(self, serie):
+        return serie.fillna(0.0).astype(float)
+    
+    def decimal_numbers_plus_five_places(self, serie):
+        return serie.astype(float).map(lambda x: '{:.5f}'.format(x).replace('.', ','))
 
     # 1.2 Função upper para as colunas do DataFrame
     def upper_columns(self, series):
@@ -277,17 +321,85 @@ class CapaDocServices:
     
     # 2. Função para criar a chave de rede
     def group_columns(self, df):
-        ...
+        df['KEY'] = (
+        df['CD_PROTOCOLO'].astype(str) + '@@' +
+        df['CD_SERV_HONORARIO'].astype(str) + '@@' +
+        df['CD_PROCEDIMENTO_TUSS'].astype(str) + '@@' +
+        df['CD_ANO'].astype(str) + '@@' +
+        df['DT_STATUS'].astype(str) + '@@' +
+        df['NM_PROCEDIMENTO'].astype(str) + '@@' +
+        df['NM_PROCEDIMENTO_TUSS'].astype(str) + '@@' +
+        df['VL_ATUAL'].astype(str) + '@@' +
+        df['VL_DEFLATOR_PORT_ATUAL'].astype(str) + '@@' +
+        df['VL_DEFLATOR_UCO_ATUAL'].astype(str) + '@@' +
+        df['VL_FILME_ATUAL'].astype(str) + '@@' +
+        df['VL_PROPOSTO'].astype(str) + '@@' +
+        df['VL_DEFLATOR'].astype(str) + '@@' +
+        df['VL_DEFLATOR_UCO'].astype(str) + '@@' +
+        df['VL_FILME_PROPOSTO'].astype(str) + '@@' +
+        df['CD_UF'].astype(str) + '@@' +
+        df['NM_MUNICIPIO'].astype(str) + '@@' +
+        df['CD_MUNICIPIO'].astype(str) + '@@' +
+        df['CD_LOCAL'].astype(str) + '@@' +
+        df['CC'].astype(str) + '@@' +
+        df['WEB'].astype(str) + '@@' +
+        df['FL_URGENCIA'].astype(str) + '@@' +
+        df['FL_ELETIVA'].astype(str) + '@@' +
+        df['FL_PE'].astype(str) + '@@'
+        )
+        columns_to_show = ['KEY', 'REDE']
+        df = df[columns_to_show].copy()
+        df.drop_duplicates(inplace=True)
+        df.sort_values(by='REDE', inplace=True)
+        df.reset_index(drop=True, inplace=True)
+        
+        return df
     
     # 2.1 Função para contar a quantidade de redes e listar as redes
     def number_of_networks_and_networks(self, df):
-        ...
+        df = (
+        df.groupby('KEY')['REDE']
+        .agg([
+            ('REDE', lambda x: ', '.join(sorted(set(x)))),
+            ('QUANTIDADE_REDES', 'nunique')
+        ])
+        .reset_index()
+        )
+        columns_to_show = ['KEY', 'QUANTIDADE_REDES', 'REDE']
+        df = df[columns_to_show].copy()
+        df.drop_duplicates(inplace=True)
+        df.sort_values(by='QUANTIDADE_REDES', ascending=False, inplace=True)
+        df.reset_index(drop=True, inplace=True)
+        return df
     
     # 2.2 Função para desagrupar as colunas
     def ungoroup_columns(self, df):
-        ...
+        columns = ['CD_PROTOCOLO', 'CD_SERV_HONORARIO', 'CD_PROCEDIMENTO_TUSS', 'CD_ANO', 'DT_STATUS', 'NM_PROCEDIMENTO', 'NM_PROCEDIMENTO_TUSS', 'VL_ATUAL', 'VL_DEFLATOR_PORT_ATUAL', 'VL_DEFLATOR_UCO_ATUAL', 'VL_FILME_ATUAL', 'VL_PROPOSTO', 'VL_DEFLATOR', 'VL_DEFLATOR_UCO', 'VL_FILME_PROPOSTO', 'CD_UF', 'NM_MUNICIPIO', 'CD_MUNICIPIO', 'CD_LOCAL', 'CC', 'WEB', 'FL_URGENCIA', 'FL_ELETIVA', 'FL_PE']
+    
+        # PRIMEIRO: fazer o split
+        df[columns] = df['KEY'].str.split('@@', expand=True).iloc[:, :24]
+
+        # DEPOIS: dropar a KEY
+        df.drop(columns=['KEY'], inplace=True)
+        
+        df.rename(columns={'REDE': 'REDES'}, inplace=True)
+        
+        columns = ['CD_PROTOCOLO', 'CD_SERV_HONORARIO', 'CD_PROCEDIMENTO_TUSS', 'CD_ANO', 'DT_STATUS', 'NM_PROCEDIMENTO', 'NM_PROCEDIMENTO_TUSS', 'VL_ATUAL', 'VL_DEFLATOR_PORT_ATUAL', 'VL_DEFLATOR_UCO_ATUAL', 'VL_FILME_ATUAL', 'VL_PROPOSTO', 'VL_DEFLATOR', 'VL_DEFLATOR_UCO', 'VL_FILME_PROPOSTO', 'CD_UF', 'NM_MUNICIPIO', 'CD_MUNICIPIO', 'CD_LOCAL', 'CC', 'WEB', 'FL_URGENCIA', 'FL_ELETIVA', 'FL_PE', 'QUANTIDADE_REDES', 'REDES']
+        df = df[columns].copy()
+        
+        return df
     
     # 3. Função para salvar o DataFrame em um arquivo Excel
     def save_to_excel(self, df_file, file_path, name_capa):
-        ...
+        if not os.path.exists(file_path):
+            os.makedirs(file_path)
+        
+        file_name = f"{name_capa}_{self.get_current_date()}.xlsx"
+        full_path = os.path.join(file_path, file_name)
+        
+        try:
+            df_file.to_excel(full_path, index=False, engine='openpyxl')
+            QMessageBox.information(self.parent, "Sucesso", f"Arquivo salvo com sucesso em: {full_path}")
+        except Exception as e:
+            QMessageBox.critical(self.parent, "Erro", f"Erro ao salvar o arquivo: {str(e)}")
         
